@@ -5,6 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
+const winston = require('winston');
 
 // Local Dependencies
 const {NODE_ENV} = require('./config');
@@ -14,6 +15,19 @@ const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
   : 'common';
 
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({filename: 'info.log'})
+  ]
+});
+
+if (NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
 
 // Middleware
 app.use(morgan(morganOption));
