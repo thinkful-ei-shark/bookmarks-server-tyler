@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const winston = require('winston');
+const {v4: uuid} = require('uuid');
 
 // Local Dependencies
 const {NODE_ENV} = require('./config');
@@ -67,11 +68,25 @@ app.use(function validateBearerToken(req, res, next) {
 });
 
 // Routes
-app.get('/', (req,res) => {
-  res.send('GET Request received');
+//  All Bookmarks
+app.get('/bookmarks', (req,res) => {
+  res.json(bookmarks);
 });
+//  Bookmark by Id
+app.get('/bookmarks/:id', (req,res) => {
+  const {id} = req.params;
+  const bookmark = bookmarks.find(bookmark => bookmark.id === id);
 
-app.post('/', (req,res) => {
+  if (!bookmark) {
+    logger.error(`Bookmark with id ${id} not found.`);
+    return res
+      .status(404)
+      .send('Bookmark Not Found');
+  }
+  res.json(bookmark);
+});
+//  Add Bookmark
+app.post('/bookmarks', (req,res) => {
   res.send('POST Request received');
 });
 
